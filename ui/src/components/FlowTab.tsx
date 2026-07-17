@@ -62,7 +62,7 @@ export default function FlowTab() {
         </h3>
         <p style={{ color: "#666", fontSize: 14, margin: 0 }}>
           The <code>Intent → OperationalPath → ValidationResult → SecurityViolation</code>{" "}
-          layer from the TwinModel target schema: <strong>Batfish calcule, Neo4j mémorise et
+          layer from the network digital twin target schema: <strong>Batfish calcule, Neo4j mémorise et
           explique</strong> — a resolved path is a small persisted object (hop list, latency,
           health), never the raw routing table. On this synthetic topology the resolver is the
           graph's own shortest-path engine; on a real-config-backed deployment the same

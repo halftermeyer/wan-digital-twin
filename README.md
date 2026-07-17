@@ -58,7 +58,7 @@ All six queries in `cypher/demo/` run copy-paste from Neo4j Browser:
 
 The demo narration (French) is in `DEMO_SCRIPT.md`.
 
-## Interactive UI (`ui/`) — TwinModel Flow layer + live scenarios
+## Interactive UI (`ui/`) — Flow layer + live scenarios
 
 A React app (same stack and look-and-feel as
 [neo4j-flight-claim-demo](https://github.com/halftermeyer/neo4j-flight-claim-demo):
@@ -182,7 +182,7 @@ npm run dev             # http://localhost:5173
 
 ### The Flow layer (`build_flow.py`)
 
-Implements the TwinModel target schema: `Application`/`Service -[:USES_INTENT]-> Intent
+Implements the network digital twin target schema: `Application`/`Service -[:USES_INTENT]-> Intent
 -[:SOURCE/DESTINATION]-> IntentGroup`, `Intent -[:RESOLVED_BY]->
 OperationalPath -[:TRAVERSES]-> Router`, `Intent -[:VALIDATED_BY]->
 ValidationResult`, `Intent -[:VIOLATED_BY]-> SecurityViolation`. Five intents,

@@ -15,7 +15,7 @@ function App() {
       <header className="app-header">
         <div className="header-content">
           <h1>
-            <span className="header-icon">&#127760;</span> WAN Digital Twin — TwinModel
+            <span className="header-icon">&#127760;</span> WAN Digital Twin
           </h1>
           <p className="subtitle">
             Batfish calcule, Neo4j mémorise et explique — topology, blast radius, SPOF, and the
