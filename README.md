@@ -9,6 +9,8 @@ Scope: **topology reachability and impact analysis only**. No BGP route
 selection, policy, or convergence simulation (that is Batfish's job — see the
 optional Phase 2, which feeds Batfish output *into* this same graph schema).
 
+![Explore tab — 44 routers across 20 cities, plotted by real coordinates over a world backdrop](docs/screenshots/1-explore.png)
+
 ## Requirements
 
 - Docker (for Neo4j Enterprise + GDS + APOC), or any reachable Neo4j 5.26+/2025.x
@@ -124,6 +126,46 @@ against the **`wan`** database — a separate database from the default `neo4j`
 Every result is backed by a visible Cypher statement in the audit drawer
 (bottom-right tab), grouped by scenario — nothing is a black box.
 
+## Screenshots
+
+**The six live scenarios (Scenarios tab).** SPOF discovery finds the same
+articulation point and bridge every time (deterministic topology); blast
+radius and the double-failure what-if isolate exactly the cities the
+topology was built to isolate; path diversity shows the resolved shortest
+path highlighted on the map.
+
+| SPOF discovery (GDS) | Blast radius — JNB isolated |
+|---|---|
+| ![SPOF](docs/screenshots/3-spof.png) | ![Blast radius](docs/screenshots/4-blast-radius.png) |
+| **Double failure — SAO isolated + 13 critical pairs** | **Path diversity — LON→SGP, 3 alternatives** |
+| ![Double failure](docs/screenshots/5-double-failure.png) | ![Path diversity](docs/screenshots/6-path-diversity.png) |
+
+**Service Impact Analysis — the downstream payoff.** Fail `PAR-CORE-01` and
+watch it live: three business services stay reachable, `Core Banking DR
+Replication` doesn't — because it depends on Johannesburg's single point of
+failure. This is "which service is impacted?" answered from the Flow layer,
+not just topology.
+
+![Service Impact Analysis](docs/screenshots/7-service-impact.png)
+
+**Flow & Compliance tab.** The `Intent → OperationalPath → ValidationResult →
+SecurityViolation` layer: five intents, four passing, one real
+`SecurityViolation` — traffic between Dubai and Singapore genuinely transits
+an EMEA router, found by construction from the topology, not scripted.
+
+![Flow & Compliance](docs/screenshots/8-flow-compliance.png)
+
+**Does this scale? (Benchmark tab).** A live stress test against an isolated
+database — never the demo's own data — with a Tier-1-bank-scale preset shown
+here.
+
+![Benchmark](docs/screenshots/9-benchmark.png)
+
+**Every result is auditable.** The Cypher statement behind any card is one
+click away, grouped by scenario, with parameters and row counts.
+
+![Cypher audit drawer](docs/screenshots/10-audit-drawer.png)
+
 ### Setup
 
 ```bash
@@ -140,8 +182,7 @@ npm run dev             # http://localhost:5173
 
 ### The Flow layer (`build_flow.py`)
 
-Implements the TwinModel target schema (per `prompts/TwinModel_POC_*.pdf`,
-slide 10): `Application`/`Service -[:USES_INTENT]-> Intent
+Implements the TwinModel target schema: `Application`/`Service -[:USES_INTENT]-> Intent
 -[:SOURCE/DESTINATION]-> IntentGroup`, `Intent -[:RESOLVED_BY]->
 OperationalPath -[:TRAVERSES]-> Router`, `Intent -[:VALIDATED_BY]->
 ValidationResult`, `Intent -[:VIOLATED_BY]-> SecurityViolation`. Five intents,
@@ -233,20 +274,28 @@ ndt-demo/
 ├── README.md                  # this file
 ├── DEMO_SCRIPT.md             # French demo narration
 ├── docker-compose.yml         # neo4j (+ optional batfish for Phase 2)
-├── .env.example               # NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
-├── requirements.txt           # neo4j, python-dotenv
+├── .env.example                     # NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
+├── requirements.txt / requirements-batfish.txt
 ├── generate_topology.py       # writes CSVs into data/ (seed=42)
 ├── load.py                    # loads CSVs, runs cypher/*.cypher in order
 ├── verify.py                  # assertions V1-V7 (+ critical-pair report)
 ├── export_impact.py           # writes map/impact.geojson for a scenario
+├── build_flow.py              # Intent/OperationalPath/Validation Flow layer
+├── ingest_batfish.py           # Phase 2 — Batfish configs -> Neo4j (db "batfish")
+├── verify_batfish.py           # assertions V8-V11
 ├── data/                      # generated CSVs (gitignored, regenerated)
 ├── cypher/
-│   ├── 01_constraints.cypher
-│   ├── 02_derived_layer.cypher
+│   ├── 01_constraints.cypher / 02_derived_layer.cypher / 03_flow_constraints.cypher
 │   └── demo/Q1..Q6
-└── map/
-    ├── index.html             # static Leaflet page (serve over HTTP)
-    └── impact.geojson         # generated
+├── batfish_snapshot/configs/  # vendored example Cisco configs (Phase 2)
+├── map/                       # static Leaflet impact map
+├── dashboard/                 # Neo4j Desktop 2 dashboard (NeoDash format)
+├── bloom/                     # Bloom perspective (search phrases + scene actions)
+├── bookmarks/                 # Neo4j Desktop 2 Query tool bookmarks
+├── docs/screenshots/          # README screenshots
+└── ui/                        # React app — Explore / Scenarios / Flow / Benchmark
+    ├── src/{lib,components}/
+    └── .env.example            # VITE_NEO4J_URI, _DATABASE, _USER, _PASSWORD
 ```
 
 ## Phase 2 (optional) — Batfish ingestion

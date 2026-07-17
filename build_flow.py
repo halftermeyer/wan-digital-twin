@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the Flow layer (Intent -> OperationalPath -> Validation -> Compliance) on
-top of the WAN topology, per the TwinModel target schema (prompts/TwinModel_POC_*.pdf,
-slide 10): Application/Service -[USES_INTENT]-> Intent -[SOURCE/DESTINATION]-> IntentGroup,
+top of the WAN topology, per the TwinModel target schema:
+Application/Service -[USES_INTENT]-> Intent -[SOURCE/DESTINATION]-> IntentGroup,
 Intent -[RESOLVED_BY]-> OperationalPath -[TRAVERSES]-> Router, Intent -[VALIDATED_BY]->
 ValidationResult, Intent -[VIOLATED_BY]-> SecurityViolation.
 
