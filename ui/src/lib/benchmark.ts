@@ -110,7 +110,7 @@ async function generateTopology(nRouters: number, nCore: number, meshDegree = 4,
 
 // Reachability via a single BFS (apoc.path.subgraphNodes) from one surviving HQ,
 // blacklisting the failed routers — NOT the naive per-router `EXISTS { variable-length
-// MATCH }` pattern the sales-demo's spec-prescribed Q2/Q4 use. That pattern matches
+// MATCH }` pattern this demo's spec-prescribed Q2/Q4 use. That pattern matches
 // on *trails* (walks), not simple paths: proving a router is UNREACHABLE in a graph
 // with independent cycles (e.g. a meshed CORE backbone, not a sparse hub-and-spoke
 // one) can force it to enumerate combinatorially many trails before concluding

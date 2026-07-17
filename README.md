@@ -1,9 +1,9 @@
-# BNP WAN Digital Twin — Neo4j Network Digital Twin demo
+# WAN Digital Twin — Neo4j Network Digital Twin demo
 
-A self-contained, reproducible pre-sales demo: an international bank WAN
-(20 cities, 44 routers) modeled as a Neo4j graph, with blast-radius analysis,
-SPOF detection (GDS articulation points / bridges), double-failure what-ifs,
-path diversity, incident RCA, and a Leaflet impact map.
+A self-contained, reproducible demo: an international bank WAN (20 cities,
+44 routers) modeled as a Neo4j graph, with blast-radius analysis, SPOF
+detection (GDS articulation points / bridges), double-failure what-ifs, path
+diversity, incident RCA, and a Leaflet impact map.
 
 Scope: **topology reachability and impact analysis only**. No BGP route
 selection, policy, or convergence simulation (that is Batfish's job — see the
@@ -85,8 +85,8 @@ against the **`wan`** database — a separate database from the default `neo4j`
   see its resolved path on the map.
 - **Benchmark** — live scaling test. Generates a synthetic router graph of any
   size (presets up to 5000, including a "1,200 routers, 60 CORE — Tier-1
-  global bank" preset — an illustrative order-of-magnitude estimate, not
-  BNP's actual figures) in an **isolated `benchmark` database** (never touches
+  global bank" preset — an illustrative order-of-magnitude estimate, not any
+  real bank's actual figures) in an **isolated `benchmark` database** (never touches
   `wan`), then times blast radius, the `O(n_core²)` critical-pair enumeration,
   and GDS `articulationPoints`/`bridges`/Yen's. The customer-facing intro
   copy in the tab itself is deliberately short; the engineering detail below
@@ -94,7 +94,7 @@ against the **`wan`** database — a separate database from the default `neo4j`
   building this, worth knowing about if this topology ever grows a denser
   backbone:
   1. Reachability uses a single BFS (`apoc.path.subgraphNodes`) per check, not
-     the sales-demo's spec-prescribed per-router `EXISTS { variable-length
+     this demo's spec-prescribed per-router `EXISTS { variable-length
      MATCH }` — that pattern matches on *trails*, and proving a router
      unreachable in a graph with independent cycles (a meshed backbone, unlike
      this demo's sparse hub-and-spoke one) can force it to enumerate
@@ -198,7 +198,7 @@ grounded in facts actually computed from this topology (not invented):
 
 **Path resolution here is done by the graph's own shortest-path/GDS engine**,
 not Batfish — this synthetic topology has no real device configs. On a real,
-Cisco-config-backed deployment (see Phase 2 below) the same schema is
+real-config-backed deployment (see Phase 2 below) the same schema is
 populated by Batfish `reachability`/`traceroute` questions instead; "Batfish
 calcule, Neo4j mémorise et explique" holds either way, only the resolver
 differs. `build_flow.py` is idempotent (`MERGE` throughout, safe to re-run).
@@ -287,7 +287,7 @@ ndt-demo/
 ├── cypher/
 │   ├── 01_constraints.cypher / 02_derived_layer.cypher / 03_flow_constraints.cypher
 │   └── demo/Q1..Q6
-├── batfish_snapshot/configs/  # vendored example Cisco configs (Phase 2)
+├── batfish_snapshot/configs/  # vendored example router configs (Phase 2)
 ├── map/                       # static Leaflet impact map
 ├── dashboard/                 # Neo4j Desktop 2 dashboard (NeoDash format)
 ├── bloom/                     # Bloom perspective (search phrases + scene actions)
@@ -300,7 +300,7 @@ ndt-demo/
 
 ## Phase 2 (optional) — Batfish ingestion
 
-Feeds Batfish-parsed real Cisco configs into the **same graph schema**, in a
+Feeds Batfish-parsed real router configs into the **same graph schema**, in a
 separate Neo4j database `batfish` (the synthetic demo database is never touched).
 
 ```bash

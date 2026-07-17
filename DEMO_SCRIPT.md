@@ -1,6 +1,6 @@
 # Script de démo — WAN Digital Twin (10 minutes)
 
-Public : ingénieurs réseau (Cisco / BNP). Prérequis : `verify.py` vert, Neo4j
+Public : ingénieurs réseau. Prérequis : `verify.py` vert, Neo4j
 Browser ouvert sur http://localhost:7474, Bloom disponible avec la perspective
 `bloom/wan_perspective.json` importée (galerie de perspectives → Import) —
 elle contient les search phrases et scene actions de chaque étape —, la carte
@@ -98,7 +98,7 @@ l'analyse d'impact partagent le même modèle, pas trois outils à réconcilier.
 
 ---
 
-## Phase 2 (optionnelle) — des configs Cisco brutes au graphe (~2 min)
+## Phase 2 (optionnelle) — des configs routeur brutes au graphe (~2 min)
 
 1. Montrer une config brute dans le terminal :
    `head -40 batfish_snapshot/configs/as1border1.cfg`.
@@ -107,4 +107,4 @@ l'analyse d'impact partagent le même modèle, pas trois outils à réconcilier.
 3. Dans Browser : `:use batfish`, puis relancer Q1 et Q3 **inchangées**.
 
 **Message :** même schéma, mêmes requêtes — mais des données issues de vraies
-configurations Cisco via Batfish. Batfish calcule, Neo4j retient et répond.
+configurations routeur via Batfish. Batfish calcule, Neo4j retient et répond.

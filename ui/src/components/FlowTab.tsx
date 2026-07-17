@@ -65,7 +65,7 @@ export default function FlowTab() {
           layer from the TwinModel target schema: <strong>Batfish calcule, Neo4j mémorise et
           explique</strong> — a resolved path is a small persisted object (hop list, latency,
           health), never the raw routing table. On this synthetic topology the resolver is the
-          graph's own shortest-path engine; on a real Cisco-config-backed deployment the same
+          graph's own shortest-path engine; on a real-config-backed deployment the same
           schema is populated by Batfish reachability/traceroute questions.
         </p>
       </div>

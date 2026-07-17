@@ -7,7 +7,7 @@ ValidationResult, Intent -[VIOLATED_BY]-> SecurityViolation.
 
 Path resolution here is done by the graph's own shortest-path engine (CYPHER 25 QPP),
 not Batfish — this synthetic topology has no real device configs for Batfish to parse.
-On a real, Cisco-config-backed deployment the same schema is populated by Batfish
+On a real, config-backed deployment the same schema is populated by Batfish
 reachability/traceroute (see ingest_batfish.py); "Batfish calcule, Neo4j memorise"
 still holds, only the resolver differs. Idempotent: safe to re-run (MERGE throughout).
 """

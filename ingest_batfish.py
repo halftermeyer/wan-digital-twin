@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Phase 2 — parse the vendored Cisco configs with Batfish and load the result
+"""Phase 2 — parse the vendored router configs with Batfish and load the result
 into Neo4j database `batfish`, using the exact same schema as the synthetic demo.
 
 Requires: `docker compose up -d batfish` and `pip install -r requirements-batfish.txt`.
