@@ -1,0 +1,146 @@
+name,description,query,id,parentId,isFolder
+WAN Digital Twin - demo,,,0,,true
+Q1 Vue d'ensemble,,,1,0,true
+Q1a Inventaire par region et role,Comptages routeurs par region/role,"// Q1a Inventaire par region et role
+MATCH (r:Router)-[:LOCATED_IN]->(c:City)
+RETURN c.region AS region, r.role AS role, count(r) AS routers
+ORDER BY region, role",2,1,false
+Q1b Liens par support,Liens physiques et capacite par medium,"// Q1b Liens par support
+MATCH (:Interface)-[l:LINK]->(:Interface)
+RETURN l.medium AS medium, count(l) AS links, sum(l.capacity_gbps) AS total_capacity_gbps
+ORDER BY medium",3,1,false
+Q1c Schema du graphe,Visualisation du modele de donnees,"// Q1c Schema du graphe
+CALL db.schema.visualization()",4,1,false
+Q2 Blast radius,,,5,0,true
+Q2 params - panne simple,A executer d'abord (PAR-CORE-01 -> JNB isolee),:param failed => ['PAR-CORE-01'],6,5,false
+Q2 Villes isolees du siege,Villes ne joignant plus Paris si $failed tombent,"// Q2 Villes isolees du siege
+CYPHER 25
+MATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})
+WHERE NOT hq.hostname IN $failed
+WITH collect(hq) AS hqs
+MATCH (r:Router)-[:LOCATED_IN]->(c:City)
+WHERE NOT r.hostname IN $failed
+WITH hqs, c, collect(r) AS cityRouters
+WHERE NONE(r IN cityRouters WHERE EXISTS {
+  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN $failed))*(hq)
+  WHERE hq IN hqs
+})
+RETURN c.code AS isolated_city, c.name, [r IN cityRouters | r.hostname] AS stranded_routers
+ORDER BY c.code",7,5,false
+Q3 SPOF,,,8,0,true
+Q3a Points d'articulation (GDS),Routeurs SPOF - attendu : PAR-CORE-01,"// Q3a Points d'articulation (GDS)
+CALL () {
+  CALL gds.graph.drop('wan_bm_ap', false) YIELD graphName
+  RETURN count(graphName) AS dropped
+}
+CALL gds.graph.project('wan_bm_ap', 'Router', {CONNECTED_TO: {orientation: 'UNDIRECTED'}}) YIELD graphName
+CALL gds.articulationPoints.stream(graphName) YIELD nodeId
+RETURN gds.util.asNode(nodeId).hostname AS spof_router
+ORDER BY spof_router",9,8,false
+Q3b Ponts (GDS),Liens critiques - attendu : PAR-CORE-01 <-> JNB-EDGE-01,"// Q3b Ponts (GDS)
+CALL () {
+  CALL gds.graph.drop('wan_bm_br', false) YIELD graphName
+  RETURN count(graphName) AS dropped
+}
+CALL gds.graph.project('wan_bm_br', 'Router', {CONNECTED_TO: {orientation: 'UNDIRECTED'}}) YIELD graphName
+CALL gds.bridges.stream(graphName) YIELD from, to
+RETURN gds.util.asNode(from).hostname AS endpoint_a, gds.util.asNode(to).hostname AS endpoint_b
+ORDER BY endpoint_a, endpoint_b",10,8,false
+Q4 Double panne,,,11,0,true
+Q4 params - double panne NYC,A executer d'abord (attendu : SAO isolee),":param failed => ['NYC-CORE-01','NYC-CORE-02']",12,11,false
+Q4 Villes isolees (double panne),"Meme requete que Q2, avec les deux cores NYC en panne","// Q4 Villes isolees (double panne)
+CYPHER 25
+MATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})
+WHERE NOT hq.hostname IN $failed
+WITH collect(hq) AS hqs
+MATCH (r:Router)-[:LOCATED_IN]->(c:City)
+WHERE NOT r.hostname IN $failed
+WITH hqs, c, collect(r) AS cityRouters
+WHERE NONE(r IN cityRouters WHERE EXISTS {
+  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN $failed))*(hq)
+  WHERE hq IN hqs
+})
+RETURN c.code AS isolated_city, c.name, [r IN cityRouters | r.hostname] AS stranded_routers
+ORDER BY c.code",13,11,false
+Q4b Paires CORE critiques,Toutes les paires CORE dont la panne conjointe isole une ville,"// Q4b Paires CORE critiques
+CYPHER 25
+MATCH (c1:Router {role:'CORE'}), (c2:Router {role:'CORE'})
+WHERE c1.hostname < c2.hostname
+WITH [c1.hostname, c2.hostname] AS failed
+CALL (failed) {
+  MATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})
+  WHERE NOT hq.hostname IN failed
+  WITH failed, collect(hq) AS hqs
+  WHERE size(hqs) > 0
+  MATCH (r:Router)-[:LOCATED_IN]->(c:City)
+  WHERE NOT r.hostname IN failed
+  WITH failed, hqs, c, collect(r) AS cityRouters
+  WHERE NONE(r IN cityRouters WHERE EXISTS {
+    MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)
+    WHERE hq IN hqs
+  })
+  RETURN collect(c.code) AS isolated_cities
+}
+WITH failed, isolated_cities
+WHERE size(isolated_cities) > 0
+RETURN failed AS failed_core_pair, isolated_cities
+ORDER BY size(isolated_cities) DESC, failed_core_pair",14,11,false
+Q5 Diversite de chemins,,,15,0,true
+Q5 params - villes src/dst,A executer d'abord (LON -> SGP par defaut),":param src => 'LON';
+:param dst => 'SGP';",16,15,false
+Q5a Plus court chemin,Chemin le plus court en latence entre $src et $dst,"// Q5a Plus court chemin
+CYPHER 25
+MATCH (a:Router)-[:LOCATED_IN]->(:City {code: $src}),
+      (b:Router)-[:LOCATED_IN]->(:City {code: $dst})
+MATCH p = SHORTEST 1 (a)-[:CONNECTED_TO]-+(b)
+RETURN a.hostname AS src_router, b.hostname AS dst_router,
+       [n IN nodes(p) | n.hostname] AS hops,
+       reduce(total = 0.0, r IN relationships(p) | total + r.latency_ms) AS total_latency_ms
+ORDER BY total_latency_ms ASC
+LIMIT 1",17,15,false
+Q5b Trois routes alternatives (Yen),k=3 plus courts chemins ponderes par latence,"// Q5b Trois routes alternatives (Yen)
+CALL () {
+  CALL gds.graph.drop('wan_bm_yens', false) YIELD graphName
+  RETURN count(graphName) AS dropped
+}
+CALL gds.graph.project('wan_bm_yens', 'Router', {CONNECTED_TO: {orientation: 'UNDIRECTED', properties: 'latency_ms'}}) YIELD graphName
+MATCH (src:Router)-[:LOCATED_IN]->(:City {code: $src})
+WITH graphName, src ORDER BY src.hostname LIMIT 1
+MATCH (dst:Router)-[:LOCATED_IN]->(:City {code: $dst})
+WITH graphName, src, dst ORDER BY dst.hostname LIMIT 1
+CALL gds.shortestPath.yens.stream(graphName, {
+  sourceNode: src, targetNode: dst, k: 3, relationshipWeightProperty: 'latency_ms'
+}) YIELD index, totalCost, nodeIds
+RETURN index + 1 AS route, [id IN nodeIds | gds.util.asNode(id).hostname] AS hops,
+       totalCost AS total_latency_ms",18,15,false
+Q6 Incident RCA,,,19,0,true
+Q6a Creer l'incident P1,Cree INC-2026-0001 sur PAR-CORE-01 (statut DOWN),"// Q6a Creer l'incident P1
+MERGE (i:Incident {id: 'INC-2026-0001'})
+SET i.severity = 'P1', i.type = 'HW_FAILURE', i.started_at = datetime('2026-07-05T08:12:00Z')
+WITH i
+MATCH (r:Router {hostname: 'PAR-CORE-01'})
+MERGE (i)-[:AFFECTS]->(r)
+SET r.status = 'DOWN'
+RETURN i.id AS incident, r.hostname AS affected_router, r.status AS simulated_status",20,19,false
+Q6b Villes impactees,Impact des incidents en cours (logique Q2),"// Q6b Villes impactees
+CYPHER 25
+MATCH (:Incident)-[:AFFECTS]->(fr:Router)
+WITH collect(DISTINCT fr.hostname) AS failed
+MATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})
+WHERE NOT hq.hostname IN failed
+WITH failed, collect(hq) AS hqs
+MATCH (r:Router)-[:LOCATED_IN]->(c:City)
+WHERE NOT r.hostname IN failed
+WITH failed, hqs, c, collect(r) AS cityRouters
+WHERE NONE(r IN cityRouters WHERE EXISTS {
+  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)
+  WHERE hq IN hqs
+})
+RETURN c.code AS impacted_city, c.name, [r IN cityRouters | r.hostname] AS stranded_routers
+ORDER BY c.code",21,19,false
+Q6c Sous-graphe incident,"Incident -> routeur -> voisins, pour la vue graphe","// Q6c Sous-graphe incident
+MATCH p = (i:Incident)-[:AFFECTS]->(:Router)-[:CONNECTED_TO]-(:Router)
+RETURN p",22,19,false
+Q6d Reset,Supprime l'incident et retablit le routeur,"// Q6d Reset
+MATCH (i:Incident {id: 'INC-2026-0001'}) DETACH DELETE i;
+MATCH (r:Router {hostname: 'PAR-CORE-01'}) SET r.status = 'UP';",23,19,false

@@ -1,0 +1,7 @@
+.env
+data/
+map/impact.geojson
+map/impact.geojson.js
+__pycache__/
+.DS_Store
+**/.DS_Store

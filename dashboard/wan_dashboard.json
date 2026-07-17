@@ -1,0 +1,496 @@
+{
+  "version": 2,
+  "title": "BNP WAN Digital Twin",
+  "description": "",
+  "pages": [
+    {
+      "id": "0",
+      "version": 1,
+      "title": "Vue d'ensemble",
+      "widgets": [
+        {
+          "version": 1,
+          "title": "Routeurs par region et role",
+          "w": 6,
+          "h": 6,
+          "x": 0,
+          "y": 4,
+          "meta": {},
+          "settings": {
+            "type": "bar",
+            "query": "MATCH (r:Router)-[:LOCATED_IN]->(c:City)\nRETURN c.region AS region, r.role AS role, count(*) AS routeurs\nORDER BY region, role",
+            "databaseName": "neo4j",
+            "dimensionKey": "region",
+            "valueKeys": [
+              "routeurs"
+            ],
+            "orientation": "vertical",
+            "scaleType": "linear",
+            "showLegend": true,
+            "showDataZoom": "auto",
+            "version": 1,
+            "barArrangement": "grouped"
+          }
+        },
+        {
+          "version": 1,
+          "title": "Liens physiques",
+          "w": 3,
+          "h": 4,
+          "x": 6,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "type": "singleValue",
+            "query": "MATCH ()-[l:LINK]->() RETURN count(l)",
+            "databaseName": "neo4j",
+            "version": 1,
+            "fontSize": 72,
+            "align": 2
+          }
+        },
+        {
+          "version": 1,
+          "title": "Villes",
+          "w": 3,
+          "h": 4,
+          "x": 9,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "type": "singleValue",
+            "query": "MATCH (c:City) RETURN count(c)",
+            "databaseName": "neo4j",
+            "version": 1,
+            "fontSize": 72,
+            "align": 2
+          }
+        },
+        {
+          "version": 1,
+          "title": "ov-text",
+          "w": 3,
+          "h": 4,
+          "x": 0,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "version": 1,
+            "type": "text",
+            "markdown": "## WAN Digital Twin\nLe WAN de la banque (20 villes, 44 routeurs) comme graphe Neo4j.\n\nCouche physique : Router → Interface → LINK ; couche derivee : CONNECTED_TO (utilisee par toutes les analyses)."
+          }
+        },
+        {
+          "version": 1,
+          "title": "Routeurs",
+          "w": 3,
+          "h": 4,
+          "x": 3,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "type": "singleValue",
+            "query": "MATCH (r:Router) RETURN count(r)",
+            "databaseName": "neo4j",
+            "version": 1,
+            "fontSize": 72,
+            "align": 2
+          }
+        },
+        {
+          "version": 1,
+          "title": "Backbone CORE (couche CONNECTED_TO)",
+          "w": 12,
+          "h": 8,
+          "x": 0,
+          "y": 10,
+          "meta": {},
+          "settings": {
+            "type": "graph",
+            "query": "MATCH (a:Router {role:'CORE'})-[r:CONNECTED_TO]-(b:Router {role:'CORE'})\nWHERE a.hostname < b.hostname\nRETURN a, r, b",
+            "databaseName": "neo4j",
+            "version": 2,
+            "layout": {
+              "type": "d3Force"
+            }
+          }
+        },
+        {
+          "version": 1,
+          "title": "Liens par support",
+          "w": 6,
+          "h": 6,
+          "x": 6,
+          "y": 4,
+          "meta": {},
+          "settings": {
+            "type": "pie",
+            "query": "MATCH ()-[l:LINK]->()\nRETURN l.medium AS support, count(*) AS liens ORDER BY support",
+            "databaseName": "neo4j",
+            "version": 1,
+            "valueKey": "liens",
+            "dimensionKey": "support",
+            "showLegend": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "1",
+      "version": 1,
+      "title": "Blast radius (what-if)",
+      "widgets": [
+        {
+          "version": 1,
+          "title": "Villes isolees et routeurs orphelins",
+          "w": 6,
+          "h": 6,
+          "x": 0,
+          "y": 4,
+          "meta": {
+            "latestCypherQueries": [
+              {
+                "query": "CYPHER 25\nWITH [$neodash_failed_router] AS failed\nMATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\nWHERE NOT hq.hostname IN failed\nWITH failed, collect(hq) AS hqs\nMATCH (r:Router)-[:LOCATED_IN]->(c:City)\nWHERE NOT r.hostname IN failed\nWITH failed, hqs, c, collect(r) AS cityRouters\nWHERE NONE(r IN cityRouters WHERE EXISTS {\n  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n  WHERE hq IN hqs\n})\nRETURN c.code AS ville, c.name AS nom,\n       [r IN cityRouters | r.hostname] AS routeurs_isoles\nORDER BY ville",
+                "origin": "user"
+              },
+              {
+                "query": "CYPHER 25\nWITH [$neodash_failed_router, 'uytxutfu', 'PAR-CORE-01'] AS failed\nMATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\nWHERE NOT hq.hostname IN failed\nWITH failed, collect(hq) AS hqs\nMATCH (r:Router)-[:LOCATED_IN]->(c:City)\nWHERE NOT r.hostname IN failed\nWITH failed, hqs, c, collect(r) AS cityRouters\nWHERE NONE(r IN cityRouters WHERE EXISTS {\n  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n  WHERE hq IN hqs\n})\nRETURN c.code AS ville, c.name AS nom,\n       [r IN cityRouters | r.hostname] AS routeurs_isoles\nORDER BY ville",
+                "origin": "user"
+              },
+              {
+                "query": "CYPHER 25\nWITH [$neodash_failed_router, 'uytxutfu'] AS failed\nMATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\nWHERE NOT hq.hostname IN failed\nWITH failed, collect(hq) AS hqs\nMATCH (r:Router)-[:LOCATED_IN]->(c:City)\nWHERE NOT r.hostname IN failed\nWITH failed, hqs, c, collect(r) AS cityRouters\nWHERE NONE(r IN cityRouters WHERE EXISTS {\n  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n  WHERE hq IN hqs\n})\nRETURN c.code AS ville, c.name AS nom,\n       [r IN cityRouters | r.hostname] AS routeurs_isoles\nORDER BY ville",
+                "origin": "user"
+              },
+              {
+                "query": "CYPHER 25\n//WITH [$neodash_failed_router] AS failed\nWITH ['PAR-CORE-01'] AS failed\nMATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\nWHERE NOT hq.hostname IN failed\nWITH failed, collect(hq) AS hqs\nMATCH (r:Router)-[:LOCATED_IN]->(c:City)\nWHERE NOT r.hostname IN failed\nWITH failed, hqs, c, collect(r) AS cityRouters\nWHERE NONE(r IN cityRouters WHERE EXISTS {\n  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n  WHERE hq IN hqs\n})\nRETURN c.code AS ville, c.name AS nom,\n       [r IN cityRouters | r.hostname] AS routeurs_isoles\nORDER BY ville",
+                "origin": "user"
+              },
+              {
+                "query": "CYPHER 25\n//WITH [$neodash_failed_router] AS failed\nMATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\nWHERE NOT hq.hostname IN ['PAR-CORE-01']//failed\nWITH failed, collect(hq) AS hqs\nMATCH (r:Router)-[:LOCATED_IN]->(c:City)\nWHERE NOT r.hostname IN failed\nWITH failed, hqs, c, collect(r) AS cityRouters\nWHERE NONE(r IN cityRouters WHERE EXISTS {\n  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n  WHERE hq IN hqs\n})\nRETURN c.code AS ville, c.name AS nom,\n       [r IN cityRouters | r.hostname] AS routeurs_isoles\nORDER BY ville",
+                "origin": "user"
+              }
+            ]
+          },
+          "settings": {
+            "type": "table",
+            "query": "CYPHER 25\nWITH [$neodash_failed_router] AS failed\nMATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\nWHERE NOT hq.hostname IN failed\nWITH failed, collect(hq) AS hqs\nMATCH (r:Router)-[:LOCATED_IN]->(c:City)\nWHERE NOT r.hostname IN failed\nWITH failed, hqs, c, collect(r) AS cityRouters\nWHERE NONE(r IN cityRouters WHERE EXISTS {\n  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n  WHERE hq IN hqs\n})\nRETURN c.code AS ville, c.name AS nom,\n       [r IN cityRouters | r.hostname] AS routeurs_isoles\nORDER BY ville",
+            "databaseName": "neo4j",
+            "actions": [],
+            "version": 1,
+            "richRenderCells": false,
+            "dataGridStyleRules": []
+          }
+        },
+        {
+          "version": 1,
+          "title": "br-text",
+          "w": 6,
+          "h": 4,
+          "x": 6,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "version": 1,
+            "type": "text",
+            "markdown": "### Simulation de panne\nChoisissez un routeur : les villes qui perdent toute connectivite vers le siege (Paris) apparaissent ci-dessous.\n\nEssayez `PAR-CORE-01` (Johannesburg isolee) — puis la table des **paires critiques** montre ce que votre supervision ne voit pas : les doubles pannes."
+          }
+        },
+        {
+          "version": 1,
+          "title": "Routeur en panne",
+          "w": 3,
+          "h": 1,
+          "x": 0,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "version": 1,
+            "type": "filter",
+            "databaseName": "neo4j",
+            "entityType": "node",
+            "entityLabel": "Router",
+            "entityPropertyKey": "hostname",
+            "parameterName": "neodash_failed_router",
+            "enableTimeZone": false,
+            "numberType": "Integer"
+          }
+        },
+        {
+          "version": 1,
+          "title": "Voisinage du routeur en panne",
+          "w": 6,
+          "h": 6,
+          "x": 6,
+          "y": 4,
+          "meta": {},
+          "settings": {
+            "type": "graph",
+            "query": "MATCH (r:Router {hostname: $neodash_failed_router})-[c:CONNECTED_TO]-(n:Router)\nRETURN r, c, n",
+            "databaseName": "neo4j",
+            "version": 2,
+            "layout": {
+              "type": "d3Force"
+            }
+          }
+        },
+        {
+          "version": 1,
+          "title": "Paires CORE critiques (double panne isolant au moins une ville)",
+          "w": 12,
+          "h": 6,
+          "x": 0,
+          "y": 10,
+          "meta": {},
+          "settings": {
+            "type": "table",
+            "query": "CYPHER 25\nMATCH (c1:Router {role:'CORE'}), (c2:Router {role:'CORE'})\nWHERE c1.hostname < c2.hostname\nWITH [c1.hostname, c2.hostname] AS failed\nCALL (failed) {\n  MATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\n  WHERE NOT hq.hostname IN failed\n  WITH failed, collect(hq) AS hqs\n  WHERE size(hqs) > 0\n  MATCH (r:Router)-[:LOCATED_IN]->(c:City)\n  WHERE NOT r.hostname IN failed\n  WITH failed, hqs, c, collect(r) AS cityRouters\n  WHERE NONE(r IN cityRouters WHERE EXISTS {\n    MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n    WHERE hq IN hqs\n  })\n  RETURN collect(c.code) AS villes_isolees\n}\nWITH failed, villes_isolees WHERE size(villes_isolees) > 0\nRETURN failed AS paire_core, villes_isolees\nORDER BY size(villes_isolees) DESC, paire_core",
+            "databaseName": "neo4j",
+            "actions": [],
+            "version": 1,
+            "richRenderCells": false,
+            "dataGridStyleRules": []
+          }
+        },
+        {
+          "version": 1,
+          "title": "Villes isolees du siege",
+          "w": 3,
+          "h": 4,
+          "x": 3,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "type": "singleValue",
+            "query": "CYPHER 25\nWITH [$neodash_failed_router] AS failed\nMATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\nWHERE NOT hq.hostname IN failed\nWITH failed, collect(hq) AS hqs\nMATCH (r:Router)-[:LOCATED_IN]->(c:City)\nWHERE NOT r.hostname IN failed\nWITH failed, hqs, c, collect(r) AS cityRouters\nWHERE NONE(r IN cityRouters WHERE EXISTS {\n  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n  WHERE hq IN hqs\n})\nRETURN count(c)",
+            "databaseName": "neo4j",
+            "version": 1,
+            "fontSize": 72,
+            "align": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "version": 1,
+      "title": "SPOF & chemins",
+      "widgets": [
+        {
+          "version": 1,
+          "title": "3 routes alternatives (Yen, k=3)",
+          "w": 12,
+          "h": 5,
+          "x": 0,
+          "y": 9,
+          "meta": {},
+          "settings": {
+            "type": "table",
+            "query": "CALL () {\n  CALL gds.graph.drop('wan_dash_yens', false) YIELD graphName\n  RETURN count(graphName) AS dropped\n}\nCALL gds.graph.project('wan_dash_yens', 'Router', {CONNECTED_TO: {orientation: 'UNDIRECTED', properties: 'latency_ms'}}) YIELD graphName\nMATCH (src:Router)-[:LOCATED_IN]->(:City {code: $neodash_src_city})\nWITH graphName, src ORDER BY src.hostname LIMIT 1\nMATCH (dst:Router)-[:LOCATED_IN]->(:City {code: $neodash_dst_city})\nWITH graphName, src, dst ORDER BY dst.hostname LIMIT 1\nCALL gds.shortestPath.yens.stream(graphName, {\n  sourceNode: src, targetNode: dst, k: 3, relationshipWeightProperty: 'latency_ms'\n}) YIELD index, totalCost, nodeIds\nRETURN index + 1 AS route, [id IN nodeIds | gds.util.asNode(id).hostname] AS sauts,\n       totalCost AS latence_ms",
+            "databaseName": "neo4j",
+            "actions": [],
+            "version": 1,
+            "richRenderCells": false,
+            "dataGridStyleRules": []
+          }
+        },
+        {
+          "version": 1,
+          "title": "Ville destination",
+          "w": 3,
+          "h": 1,
+          "x": 3,
+          "y": 5,
+          "meta": {},
+          "settings": {
+            "version": 1,
+            "type": "filter",
+            "databaseName": "neo4j",
+            "entityType": "node",
+            "entityLabel": "City",
+            "entityPropertyKey": "code",
+            "parameterName": "neodash_dst_city",
+            "enableTimeZone": false,
+            "numberType": "Integer"
+          }
+        },
+        {
+          "version": 1,
+          "title": "Ponts (liens critiques) — GDS",
+          "w": 4,
+          "h": 5,
+          "x": 4,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "type": "table",
+            "query": "CALL () {\n  CALL gds.graph.drop('wan_dash_br', false) YIELD graphName\n  RETURN count(graphName) AS dropped\n}\nCALL gds.graph.project('wan_dash_br', 'Router', {CONNECTED_TO: {orientation: 'UNDIRECTED'}}) YIELD graphName\nCALL gds.bridges.stream(graphName) YIELD from, to\nRETURN gds.util.asNode(from).hostname AS extremite_a, gds.util.asNode(to).hostname AS extremite_b\nORDER BY extremite_a, extremite_b",
+            "databaseName": "neo4j",
+            "actions": [],
+            "version": 1,
+            "richRenderCells": false,
+            "dataGridStyleRules": []
+          }
+        },
+        {
+          "version": 1,
+          "title": "sp-text",
+          "w": 4,
+          "h": 5,
+          "x": 8,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "version": 1,
+            "type": "text",
+            "markdown": "### Fragilites calculees\nPoints d'articulation et ponts sont calcules par algorithme (GDS), pas tenus a la main.\n\nEn dessous : diversite de chemins entre deux villes — plus court chemin exact (Cypher) et 3 routes alternatives (Yen)."
+          }
+        },
+        {
+          "version": 1,
+          "title": "Ville source",
+          "w": 3,
+          "h": 1,
+          "x": 0,
+          "y": 5,
+          "meta": {},
+          "settings": {
+            "version": 1,
+            "type": "filter",
+            "databaseName": "neo4j",
+            "entityType": "node",
+            "entityLabel": "City",
+            "entityPropertyKey": "code",
+            "parameterName": "neodash_src_city",
+            "enableTimeZone": false,
+            "numberType": "Integer"
+          }
+        },
+        {
+          "version": 1,
+          "title": "Points d'articulation (SPOF) — GDS",
+          "w": 4,
+          "h": 5,
+          "x": 0,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "type": "table",
+            "query": "CALL () {\n  CALL gds.graph.drop('wan_dash_ap', false) YIELD graphName\n  RETURN count(graphName) AS dropped\n}\nCALL gds.graph.project('wan_dash_ap', 'Router', {CONNECTED_TO: {orientation: 'UNDIRECTED'}}) YIELD graphName\nCALL gds.articulationPoints.stream(graphName) YIELD nodeId\nRETURN gds.util.asNode(nodeId).hostname AS routeur_spof ORDER BY routeur_spof",
+            "databaseName": "neo4j",
+            "actions": [],
+            "version": 1,
+            "richRenderCells": false,
+            "dataGridStyleRules": []
+          }
+        },
+        {
+          "version": 1,
+          "title": "Plus court chemin (latence)",
+          "w": 6,
+          "h": 4,
+          "x": 6,
+          "y": 5,
+          "meta": {},
+          "settings": {
+            "type": "table",
+            "query": "CYPHER 25\nMATCH (a:Router)-[:LOCATED_IN]->(:City {code: $neodash_src_city}),\n      (b:Router)-[:LOCATED_IN]->(:City {code: $neodash_dst_city})\nMATCH p = SHORTEST 1 (a)-[:CONNECTED_TO]-+(b)\nRETURN a.hostname AS de, b.hostname AS vers,\n       [n IN nodes(p) | n.hostname] AS sauts,\n       reduce(total = 0.0, r IN relationships(p) | total + r.latency_ms) AS latence_ms\nORDER BY latence_ms ASC\nLIMIT 1",
+            "databaseName": "neo4j",
+            "actions": [],
+            "version": 1,
+            "richRenderCells": false,
+            "dataGridStyleRules": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "version": 1,
+      "title": "Incidents (RCA)",
+      "widgets": [
+        {
+          "version": 1,
+          "title": "in-text",
+          "w": 6,
+          "h": 4,
+          "x": 6,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "version": 1,
+            "type": "text",
+            "markdown": "### Incident P1 pose sur le graphe\nCreez l'incident de demo en executant l'etape 1 de `cypher/demo/Q6_incident_rca.cypher` (Browser). L'incident, son impact et la topologie vivent dans le meme graphe.\n\nReset : bloc commente en fin de Q6."
+          }
+        },
+        {
+          "version": 1,
+          "title": "Villes impactees par les incidents",
+          "w": 6,
+          "h": 6,
+          "x": 0,
+          "y": 4,
+          "meta": {},
+          "settings": {
+            "type": "table",
+            "query": "CYPHER 25\nMATCH (:Incident)-[:AFFECTS]->(fr:Router)\nWITH collect(DISTINCT fr.hostname) AS failed\nMATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\nWHERE NOT hq.hostname IN failed\nWITH failed, collect(hq) AS hqs\nMATCH (r:Router)-[:LOCATED_IN]->(c:City)\nWHERE NOT r.hostname IN failed\nWITH failed, hqs, c, collect(r) AS cityRouters\nWHERE NONE(r IN cityRouters WHERE EXISTS {\n  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n  WHERE hq IN hqs\n})\nRETURN c.code AS ville_impactee, c.name AS nom,\n       [r IN cityRouters | r.hostname] AS routeurs_isoles\nORDER BY ville_impactee",
+            "databaseName": "neo4j",
+            "actions": [],
+            "version": 1,
+            "richRenderCells": false,
+            "dataGridStyleRules": []
+          }
+        },
+        {
+          "version": 1,
+          "title": "Incidents en cours",
+          "w": 6,
+          "h": 4,
+          "x": 0,
+          "y": 0,
+          "meta": {},
+          "settings": {
+            "type": "table",
+            "query": "MATCH (i:Incident)-[:AFFECTS]->(r:Router)\nRETURN i.id AS incident, i.severity AS severite, i.type AS type,\n       toString(i.started_at) AS debut, r.hostname AS routeur_affecte, r.status AS statut\nORDER BY incident",
+            "databaseName": "neo4j",
+            "actions": [],
+            "version": 1,
+            "richRenderCells": false,
+            "dataGridStyleRules": []
+          }
+        },
+        {
+          "version": 1,
+          "title": "Sous-graphe incident",
+          "w": 6,
+          "h": 6,
+          "x": 6,
+          "y": 4,
+          "meta": {},
+          "settings": {
+            "type": "graph",
+            "query": "MATCH (i:Incident)-[a:AFFECTS]->(r:Router)\nOPTIONAL MATCH (r)-[c:CONNECTED_TO]-(n:Router)\nRETURN i, a, r, c, n",
+            "databaseName": "neo4j",
+            "version": 2,
+            "layout": {
+              "type": "d3Force"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "params": [
+    {
+      "version": 1,
+      "key": "neodash_src_city"
+    },
+    {
+      "version": 1,
+      "key": "neodash_failed_router"
+    },
+    {
+      "version": 1,
+      "key": "neodash_dst_city"
+    }
+  ]
+}

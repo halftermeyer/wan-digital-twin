@@ -1,0 +1,737 @@
+{
+  "name": "BNP WAN Digital Twin",
+  "id": "a3f1c2e0-5b7d-4e29-9c41-bnpwandt0001",
+  "createdAt": 1767225600000,
+  "lastEditedAt": 1767225600000,
+  "version": "2.3.0",
+  "parentPerspectiveId": null,
+  "isAuto": false,
+  "hiddenCategories": [],
+  "hiddenRelationshipTypes": [],
+  "hideUncategorisedData": false,
+  "history": [
+    {
+      "userId": "neo4j",
+      "timestamp": 1767225600000
+    }
+  ],
+  "palette": {
+    "colors": [
+      "#FFE081",
+      "#C990C0",
+      "#F79767",
+      "#57C7E3",
+      "#F16667",
+      "#D9C8AE",
+      "#8DCC93",
+      "#ECB5C9",
+      "#4C8EDA",
+      "#FFC454",
+      "#DA7194",
+      "#569480",
+      "#848484",
+      "#D9D9D9"
+    ],
+    "currentIndex": 6
+  },
+  "categories": [
+    {
+      "id": 1,
+      "name": "City",
+      "labels": [
+        "City"
+      ],
+      "properties": [
+        {
+          "name": "code",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "name",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "country",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "region",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "lat",
+          "exclude": false,
+          "dataType": "number"
+        },
+        {
+          "name": "lon",
+          "exclude": false,
+          "dataType": "number"
+        }
+      ],
+      "createdAt": 1767225600000,
+      "lastEditedAt": 1767225600000,
+      "color": "#4C8EDA",
+      "size": 1.5,
+      "icon": "no-icon",
+      "captionKeys": [
+        "0_CATEGORY_NAME_CAPTION_KEY",
+        "1_CATEGORY_LABEL_CAPTION_KEY_PREFIX_City",
+        "code"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Router",
+      "labels": [
+        "Router"
+      ],
+      "properties": [
+        {
+          "name": "hostname",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "role",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "os",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "asn",
+          "exclude": false,
+          "dataType": "bigint"
+        },
+        {
+          "name": "loopback_ip",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "status",
+          "exclude": false,
+          "dataType": "string"
+        }
+      ],
+      "createdAt": 1767225600000,
+      "lastEditedAt": 1767225600000,
+      "color": "#F79767",
+      "size": 1.0,
+      "icon": "no-icon",
+      "captionKeys": [
+        "0_CATEGORY_NAME_CAPTION_KEY",
+        "1_CATEGORY_LABEL_CAPTION_KEY_PREFIX_Router",
+        "hostname"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Interface",
+      "labels": [
+        "Interface"
+      ],
+      "properties": [
+        {
+          "name": "id",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "name",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "capacity_gbps",
+          "exclude": false,
+          "dataType": "number"
+        },
+        {
+          "name": "status",
+          "exclude": false,
+          "dataType": "string"
+        }
+      ],
+      "createdAt": 1767225600000,
+      "lastEditedAt": 1767225600000,
+      "color": "#D9D9D9",
+      "size": 0.5,
+      "icon": "no-icon",
+      "captionKeys": [
+        "0_CATEGORY_NAME_CAPTION_KEY",
+        "1_CATEGORY_LABEL_CAPTION_KEY_PREFIX_Interface",
+        "name"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Provider",
+      "labels": [
+        "Provider"
+      ],
+      "properties": [
+        {
+          "name": "name",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "asn",
+          "exclude": false,
+          "dataType": "bigint"
+        }
+      ],
+      "createdAt": 1767225600000,
+      "lastEditedAt": 1767225600000,
+      "color": "#8DCC93",
+      "size": 1.0,
+      "icon": "no-icon",
+      "captionKeys": [
+        "0_CATEGORY_NAME_CAPTION_KEY",
+        "1_CATEGORY_LABEL_CAPTION_KEY_PREFIX_Provider",
+        "name"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Incident",
+      "labels": [
+        "Incident"
+      ],
+      "properties": [
+        {
+          "name": "id",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "severity",
+          "exclude": false,
+          "dataType": "string"
+        },
+        {
+          "name": "type",
+          "exclude": false,
+          "dataType": "string"
+        }
+      ],
+      "createdAt": 1767225600000,
+      "lastEditedAt": 1767225600000,
+      "color": "#F16667",
+      "size": 1.5,
+      "icon": "no-icon",
+      "captionKeys": [
+        "0_CATEGORY_NAME_CAPTION_KEY",
+        "1_CATEGORY_LABEL_CAPTION_KEY_PREFIX_Incident",
+        "id"
+      ]
+    }
+  ],
+  "relationshipTypes": [
+    {
+      "id": "CONNECTED_TO",
+      "name": "CONNECTED_TO",
+      "properties": [
+        {
+          "propertyKey": "latency_ms",
+          "type": "CONNECTED_TO",
+          "dataType": "number"
+        },
+        {
+          "propertyKey": "capacity_gbps",
+          "type": "CONNECTED_TO",
+          "dataType": "number"
+        }
+      ],
+      "color": "#848484",
+      "size": 1,
+      "captionKeys": [
+        "0_REL_TYPE_CAPTION_KEY"
+      ]
+    },
+    {
+      "id": "LINK",
+      "name": "LINK",
+      "properties": [
+        {
+          "propertyKey": "medium",
+          "type": "LINK",
+          "dataType": "string"
+        },
+        {
+          "propertyKey": "latency_ms",
+          "type": "LINK",
+          "dataType": "number"
+        },
+        {
+          "propertyKey": "capacity_gbps",
+          "type": "LINK",
+          "dataType": "number"
+        }
+      ],
+      "color": "#848484",
+      "size": 1,
+      "captionKeys": [
+        "0_REL_TYPE_CAPTION_KEY"
+      ]
+    },
+    {
+      "id": "LOCATED_IN",
+      "name": "LOCATED_IN",
+      "properties": [],
+      "color": "#848484",
+      "size": 1,
+      "captionKeys": [
+        "0_REL_TYPE_CAPTION_KEY"
+      ]
+    },
+    {
+      "id": "HAS_INTERFACE",
+      "name": "HAS_INTERFACE",
+      "properties": [],
+      "color": "#848484",
+      "size": 1,
+      "captionKeys": [
+        "0_REL_TYPE_CAPTION_KEY"
+      ]
+    },
+    {
+      "id": "BGP_PEER",
+      "name": "BGP_PEER",
+      "properties": [
+        {
+          "propertyKey": "type",
+          "type": "BGP_PEER",
+          "dataType": "string"
+        }
+      ],
+      "color": "#848484",
+      "size": 1,
+      "captionKeys": [
+        "0_REL_TYPE_CAPTION_KEY"
+      ]
+    },
+    {
+      "id": "EBGP_PEER",
+      "name": "EBGP_PEER",
+      "properties": [
+        {
+          "propertyKey": "type",
+          "type": "EBGP_PEER",
+          "dataType": "string"
+        }
+      ],
+      "color": "#848484",
+      "size": 1,
+      "captionKeys": [
+        "0_REL_TYPE_CAPTION_KEY"
+      ]
+    },
+    {
+      "id": "AFFECTS",
+      "name": "AFFECTS",
+      "properties": [],
+      "color": "#848484",
+      "size": 1,
+      "captionKeys": [
+        "0_REL_TYPE_CAPTION_KEY"
+      ]
+    }
+  ],
+  "labels": {
+    "City": [
+      {
+        "propertyKey": "code",
+        "type": "City",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "name",
+        "type": "City",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "country",
+        "type": "City",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "region",
+        "type": "City",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "lat",
+        "type": "City",
+        "dataType": "number"
+      },
+      {
+        "propertyKey": "lon",
+        "type": "City",
+        "dataType": "number"
+      }
+    ],
+    "Router": [
+      {
+        "propertyKey": "hostname",
+        "type": "Router",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "role",
+        "type": "Router",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "os",
+        "type": "Router",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "asn",
+        "type": "Router",
+        "dataType": "bigint"
+      },
+      {
+        "propertyKey": "loopback_ip",
+        "type": "Router",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "status",
+        "type": "Router",
+        "dataType": "string"
+      }
+    ],
+    "Interface": [
+      {
+        "propertyKey": "id",
+        "type": "Interface",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "name",
+        "type": "Interface",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "capacity_gbps",
+        "type": "Interface",
+        "dataType": "number"
+      },
+      {
+        "propertyKey": "status",
+        "type": "Interface",
+        "dataType": "string"
+      }
+    ],
+    "Provider": [
+      {
+        "propertyKey": "name",
+        "type": "Provider",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "asn",
+        "type": "Provider",
+        "dataType": "bigint"
+      }
+    ],
+    "Incident": [
+      {
+        "propertyKey": "id",
+        "type": "Incident",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "severity",
+        "type": "Incident",
+        "dataType": "string"
+      },
+      {
+        "propertyKey": "type",
+        "type": "Incident",
+        "dataType": "string"
+      }
+    ]
+  },
+  "metadata": {
+    "pathSegments": [
+      {
+        "source": "Router",
+        "relationshipType": "LOCATED_IN",
+        "target": "City"
+      },
+      {
+        "source": "Router",
+        "relationshipType": "HAS_INTERFACE",
+        "target": "Interface"
+      },
+      {
+        "source": "Interface",
+        "relationshipType": "LINK",
+        "target": "Interface"
+      },
+      {
+        "source": "Router",
+        "relationshipType": "CONNECTED_TO",
+        "target": "Router"
+      },
+      {
+        "source": "Router",
+        "relationshipType": "BGP_PEER",
+        "target": "Router"
+      },
+      {
+        "source": "Router",
+        "relationshipType": "EBGP_PEER",
+        "target": "Provider"
+      },
+      {
+        "source": "Incident",
+        "relationshipType": "AFFECTS",
+        "target": "Router"
+      }
+    ],
+    "indexes": [
+      {
+        "label": "City",
+        "type": "native",
+        "propertyKeys": [
+          "code"
+        ]
+      },
+      {
+        "label": "Incident",
+        "type": "native",
+        "propertyKeys": [
+          "id"
+        ]
+      },
+      {
+        "label": "Interface",
+        "type": "native",
+        "propertyKeys": [
+          "id"
+        ]
+      },
+      {
+        "label": "Provider",
+        "type": "native",
+        "propertyKeys": [
+          "name"
+        ]
+      },
+      {
+        "label": "Router",
+        "type": "native",
+        "propertyKeys": [
+          "hostname"
+        ]
+      }
+    ],
+    "stats": {
+      "labels": {},
+      "relationshipTypes": {
+        "LOCATED_IN": 44,
+        "HAS_INTERFACE": 170,
+        "BGP_PEER": 85,
+        "CONNECTED_TO": 85,
+        "EBGP_PEER": 24,
+        "LINK": 85
+      }
+    }
+  },
+  "templates": [
+    {
+      "name": "Backbone CORE (demo etape 1)",
+      "id": "tmpl:1",
+      "createdAt": 1767225600000,
+      "text": "backbone core",
+      "cypher": "MATCH (a:Router {role:'CORE'})-[r:CONNECTED_TO]-(b:Router {role:'CORE'})\nWHERE a.hostname < b.hostname\nRETURN a, r, b",
+      "isUpdateQuery": null,
+      "params": [],
+      "hasCypherErrors": false
+    },
+    {
+      "name": "Site d'une ville",
+      "id": "tmpl:2",
+      "createdAt": 1767225600000,
+      "text": "site de $ville",
+      "cypher": "MATCH p = (c:City)<-[:LOCATED_IN]-(:Router)\nWHERE toLower(c.code) = toLower($ville) OR toLower(c.name) STARTS WITH toLower($ville)\nRETURN p",
+      "isUpdateQuery": null,
+      "params": [
+        {
+          "name": "$ville",
+          "dataType": "String",
+          "collapsed": false,
+          "suggestionLabel": "City",
+          "suggestionProp": "code",
+          "suggestionBoolean": false,
+          "cypher": null
+        }
+      ],
+      "hasCypherErrors": false
+    },
+    {
+      "name": "Blast radius d'une panne (demo etape 2)",
+      "id": "tmpl:3",
+      "createdAt": 1767225600000,
+      "text": "blast radius de $routeur",
+      "cypher": "CYPHER 25\nWITH [$routeur] AS failed\nWITH failed\nMATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\nWHERE NOT hq.hostname IN failed\nWITH failed, collect(hq) AS hqs\nMATCH (r:Router)-[:LOCATED_IN]->(c:City)\nWHERE NOT r.hostname IN failed\nWITH failed, hqs, c, collect(r) AS cityRouters\nWHERE NONE(r IN cityRouters WHERE EXISTS {\n  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n  WHERE hq IN hqs\n})\nUNWIND cityRouters AS stranded\nMATCH p = (stranded)-[:LOCATED_IN]->(c)\nRETURN p",
+      "isUpdateQuery": null,
+      "params": [
+        {
+          "name": "$routeur",
+          "dataType": "String",
+          "collapsed": false,
+          "suggestionLabel": "Router",
+          "suggestionProp": "hostname",
+          "suggestionBoolean": false,
+          "cypher": null
+        }
+      ],
+      "hasCypherErrors": false
+    },
+    {
+      "name": "SPOF - points d'articulation (demo etape 3)",
+      "id": "tmpl:4",
+      "createdAt": 1767225600000,
+      "text": "spof du reseau",
+      "cypher": "CALL () {\n  CALL gds.graph.drop('wan_bloom_ap', false) YIELD graphName\n  RETURN count(graphName) AS dropped\n}\nCALL gds.graph.project('wan_bloom_ap', 'Router', {CONNECTED_TO: {orientation: 'UNDIRECTED'}}) YIELD graphName\nCALL gds.articulationPoints.stream(graphName) YIELD nodeId\nRETURN gds.util.asNode(nodeId) AS spof",
+      "isUpdateQuery": null,
+      "params": [],
+      "hasCypherErrors": false
+    },
+    {
+      "name": "Ponts critiques (demo etape 3)",
+      "id": "tmpl:5",
+      "createdAt": 1767225600000,
+      "text": "ponts critiques",
+      "cypher": "CALL () {\n  CALL gds.graph.drop('wan_bloom_br', false) YIELD graphName\n  RETURN count(graphName) AS dropped\n}\nCALL gds.graph.project('wan_bloom_br', 'Router', {CONNECTED_TO: {orientation: 'UNDIRECTED'}}) YIELD graphName\nCALL gds.bridges.stream(graphName) YIELD from, to\nWITH gds.util.asNode(from) AS a, gds.util.asNode(to) AS b\nMATCH p = (a)-[:CONNECTED_TO]-(b)\nRETURN p",
+      "isUpdateQuery": null,
+      "params": [],
+      "hasCypherErrors": false
+    },
+    {
+      "name": "Double panne NYC (demo etape 4)",
+      "id": "tmpl:6",
+      "createdAt": 1767225600000,
+      "text": "double panne NYC",
+      "cypher": "CYPHER 25\nWITH ['NYC-CORE-01','NYC-CORE-02'] AS failed\nWITH failed\nMATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\nWHERE NOT hq.hostname IN failed\nWITH failed, collect(hq) AS hqs\nMATCH (r:Router)-[:LOCATED_IN]->(c:City)\nWHERE NOT r.hostname IN failed\nWITH failed, hqs, c, collect(r) AS cityRouters\nWHERE NONE(r IN cityRouters WHERE EXISTS {\n  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n  WHERE hq IN hqs\n})\nUNWIND cityRouters AS stranded\nMATCH p = (stranded)-[:LOCATED_IN]->(c)\nRETURN p",
+      "isUpdateQuery": null,
+      "params": [],
+      "hasCypherErrors": false
+    },
+    {
+      "name": "Chemin le plus court entre deux villes (demo etape 5)",
+      "id": "tmpl:7",
+      "createdAt": 1767225600000,
+      "text": "chemin de $de vers $vers",
+      "cypher": "CYPHER 25\nMATCH (a:Router)-[:LOCATED_IN]->(ca:City), (b:Router)-[:LOCATED_IN]->(cb:City)\nWHERE toLower(ca.code) = toLower($de) AND toLower(cb.code) = toLower($vers)\nMATCH p = SHORTEST 1 (a)-[:CONNECTED_TO]-+(b)\nRETURN p\nORDER BY reduce(t = 0.0, r IN relationships(p) | t + r.latency_ms) ASC\nLIMIT 1",
+      "isUpdateQuery": null,
+      "params": [
+        {
+          "name": "$de",
+          "dataType": "String",
+          "collapsed": false,
+          "suggestionLabel": "City",
+          "suggestionProp": "code",
+          "suggestionBoolean": false,
+          "cypher": null
+        },
+        {
+          "name": "$vers",
+          "dataType": "String",
+          "collapsed": false,
+          "suggestionLabel": "City",
+          "suggestionProp": "code",
+          "suggestionBoolean": false,
+          "cypher": null
+        }
+      ],
+      "hasCypherErrors": false
+    },
+    {
+      "name": "Incidents en cours (demo etape 6)",
+      "id": "tmpl:8",
+      "createdAt": 1767225600000,
+      "text": "incidents en cours",
+      "cypher": "MATCH p = (:Incident)-[:AFFECTS]->(:Router)\nRETURN p",
+      "isUpdateQuery": null,
+      "params": [],
+      "hasCypherErrors": false
+    }
+  ],
+  "sceneActions": [
+    {
+      "name": "Simuler la panne (blast radius)",
+      "id": "sa-blast-0001",
+      "createdAt": 1767225600000,
+      "cypher": "CYPHER 25\nMATCH (f:Router) WHERE elementId(f) IN $nodes\nWITH collect(f.hostname) AS failed\nWITH failed\nMATCH (hq:Router {role:'CORE'})-[:LOCATED_IN]->(:City {code:'PAR'})\nWHERE NOT hq.hostname IN failed\nWITH failed, collect(hq) AS hqs\nMATCH (r:Router)-[:LOCATED_IN]->(c:City)\nWHERE NOT r.hostname IN failed\nWITH failed, hqs, c, collect(r) AS cityRouters\nWHERE NONE(r IN cityRouters WHERE EXISTS {\n  MATCH (r)(()-[:CONNECTED_TO]-(mid:Router WHERE NOT mid.hostname IN failed))*(hq)\n  WHERE hq IN hqs\n})\nUNWIND cityRouters AS stranded\nMATCH p = (stranded)-[:LOCATED_IN]->(c)\nRETURN p",
+      "isUpdateQuery": null,
+      "categories": null,
+      "relationshipTypes": null,
+      "hasCypherErrors": false
+    },
+    {
+      "name": "Voisinage reseau (CONNECTED_TO)",
+      "id": "sa-neigh-0002",
+      "createdAt": 1767225600000,
+      "cypher": "MATCH p = (n:Router)-[:CONNECTED_TO]-(:Router)\nWHERE elementId(n) IN $nodes\nRETURN p",
+      "isUpdateQuery": null,
+      "categories": null,
+      "relationshipTypes": null,
+      "hasCypherErrors": false
+    },
+    {
+      "name": "Interfaces et liens physiques",
+      "id": "sa-iface-0003",
+      "createdAt": 1767225600000,
+      "cypher": "MATCH p = (n:Router)-[:HAS_INTERFACE]->(:Interface)-[:LINK]-(:Interface)<-[:HAS_INTERFACE]-(:Router)\nWHERE elementId(n) IN $nodes\nRETURN p",
+      "isUpdateQuery": null,
+      "categories": null,
+      "relationshipTypes": null,
+      "hasCypherErrors": false
+    },
+    {
+      "name": "Sessions BGP (iBGP + eBGP)",
+      "id": "sa-bgp-0004",
+      "createdAt": 1767225600000,
+      "cypher": "MATCH p = (n:Router)-[:BGP_PEER|EBGP_PEER]-()\nWHERE elementId(n) IN $nodes\nRETURN p",
+      "isUpdateQuery": null,
+      "categories": null,
+      "relationshipTypes": null,
+      "hasCypherErrors": false
+    },
+    {
+      "name": "Declarer un incident P1 (simulation)",
+      "id": "sa-inc-0005",
+      "createdAt": 1767225600000,
+      "cypher": "MATCH (r:Router) WHERE elementId(r) IN $nodes\nMERGE (i:Incident {id: 'INC-BLOOM-' + r.hostname})\nSET i.severity = 'P1', i.type = 'SIMULATED', i.started_at = datetime()\nMERGE (i)-[:AFFECTS]->(r)\nSET r.status = 'DOWN'\nRETURN i, r",
+      "isUpdateQuery": true,
+      "categories": null,
+      "relationshipTypes": null,
+      "hasCypherErrors": false
+    },
+    {
+      "name": "Retablir (statut UP + suppression incidents)",
+      "id": "sa-fix-0006",
+      "createdAt": 1767225600000,
+      "cypher": "MATCH (r:Router) WHERE elementId(r) IN $nodes\nOPTIONAL MATCH (i:Incident)-[:AFFECTS]->(r)\nDETACH DELETE i\nSET r.status = 'UP'\nRETURN r",
+      "isUpdateQuery": true,
+      "categories": null,
+      "relationshipTypes": null,
+      "hasCypherErrors": false
+    }
+  ]
+}

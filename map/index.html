@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>WAN Digital Twin — Impact Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    html, body, #map { height: 100%; margin: 0; background: #111; }
+    .legend {
+      background: rgba(20, 20, 20, 0.85); color: #eee; padding: 10px 14px;
+      border-radius: 6px; font: 13px/1.6 system-ui, sans-serif;
+    }
+    .legend .dot { display: inline-block; width: 10px; height: 10px;
+      border-radius: 50%; margin-right: 6px; }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="impact.geojson.js"></script> <!-- fallback for file:// where fetch is blocked -->
+<script>
+  const OK = '#2ecc71', DOWN = '#e74c3c';
+  const map = L.map('map', { worldCopyJump: true }).setView([25, 20], 2);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 10
+  }).addTo(map);
+
+  fetch('impact.geojson')
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .catch(() => {
+      if (window.IMPACT_DATA) return window.IMPACT_DATA;
+      throw new Error('impact.geojson not reachable and no impact.geojson.js fallback found');
+    })
+    .then(data => {
+      const failed = (data.properties && data.properties.failed) || [];
+      L.geoJSON(data, {
+        filter: f => f.geometry.type === 'LineString',
+        style: f => f.properties.status === 'DOWN'
+          ? { color: DOWN, weight: 2, opacity: 0.9, dashArray: '6 6' }
+          : { color: OK, weight: 1.2, opacity: 0.45 }
+      }).addTo(map);
+      L.geoJSON(data, {
+        filter: f => f.geometry.type === 'Point',
+        pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+          radius: f.properties.status === 'ISOLATED' ? 9 : 6,
+          color: f.properties.status === 'ISOLATED' ? DOWN : OK,
+          fillColor: f.properties.status === 'ISOLATED' ? DOWN : OK,
+          fillOpacity: 0.9, weight: 1
+        }).bindTooltip(`${f.properties.code} — ${f.properties.name} (${f.properties.status})`)
+      }).addTo(map);
+
+      const legend = L.control({ position: 'bottomleft' });
+      legend.onAdd = () => {
+        const div = L.DomUtil.create('div', 'legend');
+        div.innerHTML =
+          `<b>WAN Digital Twin — impact</b><br>` +
+          `Failed router(s): ${failed.length ? failed.join(', ') : 'none'}<br>` +
+          `<span class="dot" style="background:${OK}"></span>city / link OK<br>` +
+          `<span class="dot" style="background:${DOWN}"></span>city isolated / link down`;
+        return div;
+      };
+      legend.addTo(map);
+    })
+    .catch(err => alert('Cannot load impact data — run export_impact.py first.\n' +
+      'Then open via HTTP (cd map && python -m http.server 8000) or reopen this file.\n' + err));
+</script>
+</body>
+</html>
